@@ -10,7 +10,7 @@ export function createUser(req,res){
     const newUserData = req.body
 
     if(newUserData.type == "admin"){
-        if(req.user==null){
+        if(req.user ==null){
            res.json({
             message : "Please login as administrator to create admin account"
            })
@@ -46,6 +46,7 @@ export function loginUser(req,res){
     User.find({email : req.body.email}).then(
         (users)=>{
            if(users.length == 0){
+            
             res.json({
                 message : "user not found"
             })
