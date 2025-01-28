@@ -95,12 +95,22 @@ export function isAdmin(req){
         return false
     }
 
-    if(req.user.type !="customer"){
+    if(req.user.type !="admin"){
         return false
     }
 
     return true
 }
 
+export function isCustomer(req){
+    if(req.user==null){
+      return false
+    }
+    if(req.user.type != "customer"){
+      return false
+    }
+    return true
+  }
+  
 // "email" : "tharidujayasooriya232@gmail.com", "password" : "tharidhu1225", "customer"
 // "email" : "tharidujayasooriya@gmail.com", "password" : "tharidhu1225", "admin"
