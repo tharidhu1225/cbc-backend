@@ -16,14 +16,14 @@ export async function createOrder(req, res) {
         let orderId
 
         if (latestOrder.length == 0) {
-            orderId = "P1001"
+            orderId = "CBC1001"
         } else {
             const currentOrderId = latestOrder[0].orderId
-            const numberString = currentOrderId.replace("P", "")
+            const numberString = currentOrderId.replace("CBC", "")
             const number = parseInt(numberString)
             const newNumber = (number + 1).toString();
             // const newNumber = (number + 1).toString().padStart(4, "0"); // No need to use padStart if orderId starts with 1 anyway from the begining
-            orderId = "P" + newNumber
+            orderId = "CBC" + newNumber
         }
 
         const newOrderData = req.body; // Get the incoming order data from the request body.
