@@ -16,7 +16,7 @@ export async function createOrder(req, res) {
         let orderId
 
         if (latestOrder.length == 0) {
-            orderId = "CBC1001"
+            orderId = "CBC0001"
         } else {
             const currentOrderId = latestOrder[0].orderId
             const numberString = currentOrderId.replace("CBC", "")

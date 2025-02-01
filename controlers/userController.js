@@ -45,12 +45,12 @@ export function loginUser(req,res){
 
     User.find({email : req.body.email}).then(
         (users)=>{
-           if(users.length == 0){
+            if(users.length == 0){
             
-            res.json({
-                message : "user not found"
-            })
-           }else{
+                res.json({
+                    message : "user not found"
+                })
+               }else{
 
             const user = users[0]
 
@@ -69,7 +69,14 @@ export function loginUser(req,res){
              
              res.json({
                 message : "user logged in",
-                token : token
+                token : token,
+                user : {
+                    firstName : user.firstName,
+                    lastName : user.lastName,
+                    type : user.type,
+                    profilePicture : user.profilePicture,
+                    email : user.email
+                } 
              })
 
             }else{

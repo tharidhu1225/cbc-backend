@@ -22,7 +22,7 @@ app.use(cors())
 mongoose.connect(mongoUrl,{})
 
 const connection = mongoose.connection;
-
+ 
 connection.once("open",()=>{
    
     console.log("Database connected");
