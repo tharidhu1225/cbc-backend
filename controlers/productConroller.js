@@ -12,7 +12,7 @@ export function createProduct(req,res){
             message : "Product created"
         })
     }).catch((error)=>{
-        res.json({
+        res.status(403).json({
             message : error
         })
     })
