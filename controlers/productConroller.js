@@ -37,7 +37,7 @@ export function deleteProduct(req,res){
             message : "Product deleted"
         })
     }).catch((error)=>{
-        res.status(403).json({
+        res.json({
             message : error
         })
     })
