@@ -56,7 +56,7 @@ export function updateProduct(req,res){
             message: "Product updated"
         })
     }).catch((error)=>{
-        res.status(403).json({
+        res.json({
             message: error
         })
     })
