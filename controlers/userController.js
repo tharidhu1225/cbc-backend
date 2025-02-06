@@ -120,5 +120,5 @@ export function isCustomer(req){
     return true
   }
   
-// "email" : "tharidujayasooriya232@gmail.com", "password" : "tharidhu1225", "customer"
+
 // "email" : "tharidujayasooriya@gmail.com", "password" : "tharidhu1225", "admin"
