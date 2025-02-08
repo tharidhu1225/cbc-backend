@@ -55,8 +55,8 @@ export async function createOrder(req, res) {
 
             newProductArray[i] = { // Create a new object for the product with the required fields
                 name: product.productName,
-                price: product.price,
-                quantity: newOrderData.orderedItems[i].quantity,
+                price: product.lastPrice,
+                quantity: newOrderData.orderedItems[i].qty,
                 image: product.images[0]
             };
         }
@@ -109,13 +109,13 @@ export async function getOrders(req, res) {
                 });
                 return;
             }
-            lebeledTotal += product.price*newOrderData.orderedItems[i].quantity;
-            total += product.lastPrice*newOrderData.orderedItems[i].quantity;
+            lebeledTotal += product.price*newOrderData.orderedItems[i].qty;
+            total += product.lastPrice*newOrderData.orderedItems[i].qty;
             newProductArray[i] = { // Create a new object for the product with the required fields
                 name: product.productName,
                 price: product.lastPrice,
                 lebeledPrice : product.price,
-                quantity: newOrderData.orderedItems[i].quantity,
+                quantity: newOrderData.orderedItems[i].qty,
                 image: product.images[0]
             };
         }
