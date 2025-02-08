@@ -5,6 +5,6 @@ import { createOrder, getOrders } from "../controlers/orderConroller.js";
 const orderRouter = express.Router();
 
 orderRouter.post("/", createOrder)
-orderRouter.get("/orders",getOrders)
+orderRouter.post("/orders",getOrders)
 
 export default orderRouter;
