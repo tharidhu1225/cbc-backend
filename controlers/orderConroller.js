@@ -81,8 +81,54 @@ export async function createOrder(req, res) {
 
 export async function getOrders(req, res) {
     try {
-        const orders = await Order.find({ email: req.user.email }) // get the orders which are email equal to the logged in user's email (That user's orders)
-        res.status(200).json(orders)
+
+        const newOrderData = req.body; // Get the incoming order data from the request body.
+        
+        const newProductArray = []; // Initialize an empty array to store detailed product information.
+
+        let total = 0;
+        let lebeledTotal = 0;
+
+
+        for (let i = 0; i < newOrderData.orderedItems.length; i++) {
+            const product = await Product.findOne({ // Find the product in the database using the productId from the request.
+                productId: newOrderData.orderedItems[i].productId
+            });
+
+            if (!product) { // If the product is not found, send an error response and stop further execution.
+                res.status(404).json({
+                    message: `Product with the id ${newOrderData.orderedItems[i].productId} is not found` // An easy way to concatenation
+                    // message: "Product with the id " + newOrderData.orderedItems[i].productId + " is not found"
+                });
+                return;
+            }
+
+            if (product.stock < newOrderData.orderedItems[i].quantity) { // Check if there is enough stock for the order
+                res.status(400).json({
+                    message: `Insufficient stock for product: ${product.productName}. Only ${product.stock} items are available.`
+                });
+                return;
+            }
+            lebeledTotal += product.price*newOrderData.orderedItems[i].quantity;
+            total += product.lastPrice*newOrderData.orderedItems[i].quantity;
+            newProductArray[i] = { // Create a new object for the product with the required fields
+                name: product.productName,
+                price: product.lastPrice,
+                lebeledPrice : product.price,
+                quantity: newOrderData.orderedItems[i].quantity,
+                image: product.images[0]
+            };
+        }
+
+        newOrderData.orderedItems = newProductArray;
+        newOrderData.total = total;
+        
+        res.json({
+            orderedItems : newProductArray,
+            total : total,
+            lebeledTotal : lebeledTotal,
+        });
+
     } catch (error) {
         res.status(500).json({
             message: error.message
