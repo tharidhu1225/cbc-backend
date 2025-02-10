@@ -1,142 +1,151 @@
 import Order from "../models/order.js";
-import { isCustomer } from "./userController.js";
 import Product from "../models/product.js";
+import { isAdmin, isCustomer } from "./userController.js";
 
-export async function createOrder(req, res) {
+export async function createOrder(req,res){
 
-    if (!isCustomer(req)) {
+    if(!isCustomer){
         res.json({
-            message: "please login as customer to add order"
+            message : "Please login as customer to create orders"
         })
-    return
     }
-
-    try {
-        const lastOrder = await Order.find().sort
-        ({ date: -1 }).limit(1)
+    try{
+        const latestOrder = await Order.find().sort({orderId : -1}).limit(1)
+        console.log(latestOrder);
 
         let orderId 
 
-        if (lastOrder.length == 0) {
-            orderId = "CBC001";
-        } else {
-           const currentOrderId = lastOrder[0].orderId
+        if(latestOrder.length == 0){
+            orderId = "CBC0001"
+        }else{
+            const currentOrderId = latestOrder[0].orderId
             
+            const numberString = currentOrderId.replace("CBC","")
 
-            const numberString = currentOrderId.replace("CBC", "")
+            const number  = parseInt(numberString)
 
-            const number = parseInt(numberString)
+            const newNumber = (number  + 1).toString().padStart(4, "0");
 
-            const newnumber = (number + 1).toString().padStart(4, "0");
-
-            orderId = "CBC" + newnumber
-              
+            orderId = "CBC" + newNumber
         }
 
-        const newOrderData = req.body;
+        const newOrderData = req.body
 
-        const newProductArray=[]
+        const newProductArray = []
 
-        for(let i=0;i<newOrderData.orderedItems.length;i++){
-            const product = await product.findOne({
+        for(let i=0; i<newOrderData.orderedItems.length;i++){
+
+            const product = await Product.findOne({
                 productId : newOrderData.orderedItems[i].productId
-
             })
-            if(product==null){
+
+            if(product == null){
                 res.json({
-                    message: "Product with "+newOrderData.orderedItems[i].productId+ " not found"
+                    message : "Product with id "+newOrderData.orderedItems[i].productId+" not found"
                 })
                 return
             }
+
             newProductArray[i] = {
-                productName : product.productName,
+                name: product.productName,
                 price : product.lastPrice,
                 quantity : newOrderData.orderedItems[i].qty,
-                image : product.image,
-                
+                image : product.images[0]
             }
-            console.log(newProductArray)
-
-            newOrderData.orderedItems = newProductArray
-
+            
         }
 
+        console.log(newProductArray)
 
-        newOrderData.orderId = orderId;
-        newOrderData.email = req.user.email;
+        newOrderData.orderedItems = newProductArray
+        
+        newOrderData.orderId = orderId
+        newOrderData.email = req.user.email
 
         const order = new Order(newOrderData)
 
-        await order.save()
-         
+        const savedOrder = await order.save()
+
         res.json({
-            message: "Order created"
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+            message : "Order created",
+            order : savedOrder
+        })
+
+    }catch(error){
+        console.log("Error:", error);
+        res.status(500).json({
+            message : error.message
+        })
     }
 }
 
-export async function getOrders(req,res) {
-try {
-    const orders = await Order.find({email : req.user.email})
-    res.json(orders)
-} catch (error) {
-    res.status(500).json({ 
-        message: error.message
-     })  
-
-}
+export async function getOrders(req,res){
+    try{
+        if(isCustomer(req)){
+            const orders = await Order.find({email : req.user.email})
+            res.json(orders)
+            return;
+        }else if(isAdmin(req)){
+            const orders = await orders.find({});
+            res.json(orders);
+            return;
+        }else{
+            res.json({
+                message: "Please login to view orders"
+            })
+        }
+    }catch(error){
+        res.status(500).json({
+            message : error.message
+        })
+    }
 }
 
 export async function getQuote(req,res){
-   
-    try {
-     
-        const newOrderData = req.body;
+    try{
+        const newOrderData = req.body
 
-        const newProductArray=[]
+        const newProductArray = []
 
         let total = 0;
-        let lebeledTotal = 0;
+        let labeledTotal = 0;
+        console.log(req.body)
+        for(let i=0; i<newOrderData.orderedItems.length;i++){
 
-        for(let i=0;i<newOrderData.orderedItems.length;i++){
-            const product = await product.findOne({
+            const product = await Product.findOne({
                 productId : newOrderData.orderedItems[i].productId
-
             })
-            if(product==null){
+
+            if(product == null){
                 res.json({
-                    message: "Product with "+newOrderData.orderedItems[i].productId+ " not found"
+                    message : "Product with id "+newOrderData.orderedItems[i].productId+" not found"
                 })
                 return
             }
-            lebeledTotal += product.price * newOrderData.orderedItems[i].qty;
+            labeledTotal += product.price * newOrderData.orderedItems[i].qty;
             total += product.lastPrice * newOrderData.orderedItems[i].qty;
-            
             newProductArray[i] = {
-                productName : product.productName,
+                name: product.productName,
                 price : product.lastPrice,
-                lebeledPrice : product.price,
+                labeledPrice : product.price,
                 quantity : newOrderData.orderedItems[i].qty,
-                image : product.images[0],
-              
+                image : product.images[0]
             }
+            
         }
         console.log(newProductArray)
 
-        newOrderData.orderedItems = newProductArray;
+        newOrderData.orderedItems = newProductArray
         newOrderData.total = total;
-
         res.json({
             orderedItems : newProductArray,
             total : total,
-            lebeledTotal : lebeledTotal,
-        });
-
-    } catch (error) {
-        res.status(500).json({ 
-            message: error.message,
-        });
+            labeledTotal : labeledTotal
+        })
+    }catch(error){
+        console.log("Error:", error);
+        res.status(500).json({
+            message : error.message
+        })
     }
 }
