@@ -43,14 +43,14 @@ export async function createOrder(req, res) {
                 return;
             }
 
-            if (product.stock < newOrderData.orderedItems[i].quantity) { // Check if there is enough stock for the order
+            if (product.stock < newOrderData.orderedItems[i].qty) { // Check if there is enough stock for the order
                 res.status(400).json({
                     message: `Insufficient stock for product: ${product.productName}. Only ${product.stock} items are available.`
                 });
                 return;
             }
 
-            product.stock -= newOrderData.orderedItems[i].quantity; // Decrease the product stock
+            product.stock -= newOrderData.orderedItems[i].qty; // Decrease the product stock
             await product.save(); // Save the updated stock to the database
 
             newProductArray[i] = { // Create a new object for the product with the required fields
@@ -103,7 +103,7 @@ export async function getOrders(req, res) {
                 return;
             }
 
-            if (product.stock < newOrderData.orderedItems[i].quantity) { // Check if there is enough stock for the order
+            if (product.stock < newOrderData.orderedItems[i].qty) { // Check if there is enough stock for the order
                 res.status(400).json({
                     message: `Insufficient stock for product: ${product.productName}. Only ${product.stock} items are available.`
                 });
