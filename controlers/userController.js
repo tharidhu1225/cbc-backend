@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config()
 
@@ -119,6 +120,68 @@ export function isCustomer(req){
     }
     return true
   }
+
+export async function googleLogin(req,res){
+    const token = req.body.token
+
+    try{
+        const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      const email = response.data.email
+      //check if user exits
+      const user = await User.findOne({email : email})
+
+      if (user) {
+        const token = jwt.sign(
+            {
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              isBlocked: user.isBlocked,
+              type: user.type,
+              profilePicture: user.profilePicture,
+            },
+            process.env.SECRET // ✅ Fixed secret variable name
+          );
+    
+          return res.json({
+            message: "User logged in",
+            token,
+            user: {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              type: user.type,
+              profilePicture: user.profilePicture,
+              email: user.email,
+            },
+          });
+        } else {
+          // Create new user
+          const newUser = new User({
+            email,
+            firstName: response.data.given_name,
+            lastName: response.data.family_name,
+            type: "customer",
+            password: "ffffff",
+            profilePicture: response.data.picture,
+          });
+    
+          await newUser.save(); // ✅ Added `await` to properly save user
+    
+          return res.json({ message: "User created" });
+        }
+      
+
+    }catch(e){
+        res.json({
+            message : "Google login Faild"
+        })
+    }
+}  
   
 
 // "email" : "tharidujayasooriya@gmail.com", "password" : "tharidhu1225", "admin"
