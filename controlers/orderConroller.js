@@ -1,23 +1,39 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
-import { isAdmin, isCustomer } from "./userController.js";
+
 
 export async function createOrder(req,res){
 
-    try {
-        const { name, email, address, phone, orderItems } = req.body;
-    
-        if (!name || !email || !address || !phone || !orderItems.length) {
-          return res.status(400).json({ message: "All fields are required" });
-        }
-    
-        const newOrder = new Order({ name, email, address, phone, orderItems });
-        await newOrder.save();
-    
-        res.status(201).json({ message: "Order placed successfully!", order: newOrder });
-      } catch (error) {
-        res.status(500).json({ message: "Server error", error });
-      }
+  try {
+    const { name, email, address, phone, orderItems, paymentMethod } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !address || !phone || !orderItems.length) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Create new order with default values for order status and payment status
+    const newOrder = new Order({
+      name,
+      email,
+      address,
+      phone,
+      orderItems,
+      paymentMethod: paymentMethod || "Cash on Delivery", // Default payment method
+      paymentStatus: "Pending", // Default payment status
+      orderStatus: "Pending", // Default order status
+      trackingNumber: "", // Empty tracking number initially
+    });
+
+    await newOrder.save();
+
+    res.status(201).json({
+      message: "Order placed successfully!",
+      order: newOrder,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
 }
 
 export async function getOrders(req, res) {
