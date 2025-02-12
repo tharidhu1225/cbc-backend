@@ -182,6 +182,16 @@ export async function googleLogin(req,res){
         })
     }
 }  
+
+export async function getUser(req,res) {
+    if(req.user==null){
+        res.status(404).json({
+            message: "Please login to view user details"
+        })
+        return
+    }
+    res.json(req.user)
+}
   
 
 // "email" : "tharidujayasooriya@gmail.com", "password" : "tharidhu1225", "admin"
