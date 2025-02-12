@@ -20,14 +20,26 @@ export async function createOrder(req,res){
       }
 }
 
-export async function getOrders(req,res){
+export async function getOrders(req, res) {
     try {
-        const orders = await Order.find();
-        res.status(200).json(orders);
-      } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+      if(isCustomer(req)){
+        const order1 =await Order.find({email:req.user.email});   // I changed this variable from order to order1.
+        res.json(order1);
+        return;
       }
-}
+      if(isAdmin(req)){
+        const order2 =await Order.find({});       // I changed this variable from order to order2.
+        res.json(order2);
+        return;
+      }
+      const orders = await Order.find({ email: req.user.email });
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message
+      });
+    }
+  }
 
 export async function getQuote(req,res){
     try{
