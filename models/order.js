@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
       price: { type: Number, required: true }
     }
   ],
+  
 
   paymentMethod: { type: String, required: true, default: "Cash on Delivery" }, // Can be "Credit Card", "PayPal", etc.
   paymentStatus: { type: String, required: true, default: "Pending" }, // "Pending", "Paid", "Failed"
