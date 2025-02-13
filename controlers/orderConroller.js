@@ -5,7 +5,7 @@ import Product from "../models/product.js";
 export async function createOrder(req,res){
 
   try {
-    const { name, email, address, phone, orderItems, paymentMethod } = req.body;
+    const { myName,customerName, email, address, phone, orderItems, paymentMethod } = req.body;
 
     // Validate required fields
     if (!name || !email || !address || !phone || !orderItems.length) {
@@ -14,7 +14,8 @@ export async function createOrder(req,res){
 
     // Create new order with default values for order status and payment status
     const newOrder = new Order({
-      name,
+      myName,
+      customerName,
       email,
       address,
       phone,
