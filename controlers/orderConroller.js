@@ -8,7 +8,7 @@ export async function createOrder(req,res){
     const { myName,customerName, email, address, phone, orderItems, paymentMethod } = req.body;
 
     // Validate required fields
-    if (!name || !email || !address || !phone || !orderItems.length) {
+    if (!myName || !customerName || !email || !address || !phone || !orderItems.length) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
