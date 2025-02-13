@@ -184,13 +184,12 @@ export async function googleLogin(req,res){
 }  
 
 export async function getUser(req,res) {
-    if(req.user==null){
-        res.status(404).json({
-            message: "Please login to view user details"
-        })
-        return
-    }
-    res.json(req.user)
+    try {
+        const users = await User.find(); // Fetch all users from DB
+        res.status(200).json(users);
+      } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+      }
 }
   
 
